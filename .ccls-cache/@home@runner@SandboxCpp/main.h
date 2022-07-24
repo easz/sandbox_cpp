@@ -1,3 +1,0 @@
-namespace FunctionTemplate {
-void test();
-}
