@@ -16,7 +16,7 @@ DEPS = $(SRCS:.cpp=.d)
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c "$<" -o "$@"
 
-include $(DEPS)
+-include $(DEPS)
 
 main: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o "$@"
