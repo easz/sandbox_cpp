@@ -3,7 +3,7 @@
 namespace FunctionTemplate {
 
 class Klazz {
-public:
+ public:
   /*
    * ERROR:
    * constructor templates are named without using a function name, there
@@ -12,13 +12,17 @@ public:
    */
   // template <typename T> Klazz() {}
 
-  template <typename T> Klazz(T t) {}
+  template <typename T>
+  Klazz(T t) {}
 
   /*
    * Template argument deduction takes place after the function template name
    * lookup. Template instantions are not overloaded
    */
-  template <typename T> void func() { auto a = T(); }
+  template <typename T>
+  void func() {
+    auto a = T();
+  }
 };
 
 int main() {
@@ -41,4 +45,4 @@ int main() {
   return 0;
 }
 
-} // namespace FunctionTemplate
+}  // namespace FunctionTemplate

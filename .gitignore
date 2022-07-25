@@ -2,3 +2,4 @@
 *.d
 main
 .ccls-cache
+.vscode
