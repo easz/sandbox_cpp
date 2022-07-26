@@ -1,6 +1,13 @@
 
 #include <memory>
 #include <vector>
+
+#include "main.h"
+
+/*
+ * prefer `T obj;` or `T obj{};` over `T obj();` for construct an object to avoid most vexing parse.
+ */
+
 namespace MostVexingParse {
 struct NonCopyable {
   NonCopyable() = default;
@@ -14,6 +21,7 @@ int main() {
   std::vector<NonCopyable> v;
   NonCopyable nc0;
   NonCopyable nc1{};
+
   v.push_back(NonCopyable());
   v.push_back(std::move(nc0));
   v.push_back(std::move(nc1));
@@ -26,5 +34,7 @@ int main() {
    */
   // NonCopyable nc2();
   // v.push_back(nc2);
+
+  return 0;
 }
 }  // namespace MostVexingParse

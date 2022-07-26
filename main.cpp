@@ -11,4 +11,5 @@
 int main() {
   RUN_TEST(FunctionTemplate);
   RUN_TEST(TypeErasure);
+  RUN_TEST(MostVexingParse);
 }

@@ -1,3 +1,4 @@
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -6,48 +7,64 @@
 
 namespace TypeErasure {
 
-class Object {
+/*
+ * 'Type Erasure' as static polymorphism with templates
+ */
+
+class Task {
  protected:
-  struct Concept {
-    virtual ~Concept() {}
-    virtual void operator()() const = 0;
+  struct ICallable {
+    virtual ~ICallable() = default;
+    virtual void operator()() = 0;
   };
 
   template <typename T>
-  struct Model : Concept {
-    Model(const T& t) : _model(t) {}
-    void operator()() const override { _model(); }
+  struct Callable : ICallable {
+    /*
+     * Note:
+     * This universal constructor will be also used for copy construction.
+     * https://ericniebler.com/2013/08/07/universal-references-and-the-copy-constructo/
+     */
+    template <typename TT>
+    Callable(TT&& t) : _callable(std::forward<TT>(t)) {}
+    void operator()() override { _callable(); }
 
    private:
-    T _model;
+    T _callable;
   };
 
  public:
   template <typename T>
-  Object(T&& obj) : _object(std::make_unique<Model<T>>(std::forward<T>(obj))) {}
+  Task(T&& obj) : _task(std::make_shared<Callable<T>>(std::forward<T>(obj))) {}
 
-  void operator()() const { (*_object)(); }
+  void operator()() { (*_task)(); }
 
  private:
-  std::unique_ptr<const Concept> _object;
+  std::shared_ptr<ICallable> _task;
 };
 
 int main() {
-  auto lambda1 = []() { std::cout << "lamda called" << std::endl; };
-  auto obj1 = Object(lambda1);
-  obj1();
+  auto lambda1 = []() { std::cout << "lambda called" << std::endl; };
 
   struct Klass {
-    void operator()() const { std::cout << "Klass called" << std::endl; }
+    void f1() const {
+      std::cout << "member const function called" << std::endl;
+    }
+    void f2() {
+      std::cout << "another none-const member function called" << std::endl;
+    }
   } klass;
 
-  auto lambda2 = [&klass]() { klass(); };
-  auto obj2 = Object(lambda2);
-  auto vec = std::vector<Object>();
-  vec.push_back(std::move(obj2));
-  vec.push_back(Object(std::move(lambda2)));
-  for (auto v : vec) {
-    v();
+  auto task1 = Task(lambda1);
+  const auto task2 = Task([klass]() { klass.f1(); });
+
+  auto tasks = std::vector<Task>();
+  tasks.push_back(task1);
+  tasks.push_back(task2);
+  tasks.push_back(Task(std::function<void()>(std::bind(&Klass::f2, &klass))));
+
+  for (auto& task : tasks) {
+    task();
   }
 
   return 0;
