@@ -1,15 +1,11 @@
 #include "main.h"
 
-#include <iostream>
-
-#define RUN_TEST(ns)                                \
-  {                                                 \
-    std::cout << "Test: '" #ns << "'" << std::endl; \
-    ns::main();                                     \
-  }
-
 int main() {
   RUN_TEST(FunctionTemplate);
-  RUN_TEST(TypeErasure);
+  RUN_TEST(FunctionPointer);
+  RUN_TEST(UniversalReference);
   RUN_TEST(MostVexingParse);
+
+  RUN_TEST(Polymorphism);
+  RUN_TEST(TypeErasure);
 }

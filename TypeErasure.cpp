@@ -1,71 +1,78 @@
 #include <functional>
 #include <iostream>
 #include <memory>
-#include <vector>
+#include <string>
 
 #include "main.h"
 
-namespace TypeErasure {
-
 /*
- * 'Type Erasure' as static polymorphism with templates
+ * 'Type Erasure' with static polymorphism or duck-typing
+ *
+ * `Wrapper` holds a pointer of a adapter `Model` which implements a `Concept`
+ * and redirects call to actual objects.
+ *
+ * The example here defines a `Wrapper` to hold functors (i.e. a static variant
+ * to `std::function`)
  */
 
-class Task {
+namespace TypeErasure {
+
+class Wrapper {
  protected:
-  struct ICallable {
-    virtual ~ICallable() = default;
-    virtual void operator()() = 0;
+  struct Concept {
+    virtual ~Concept() = default;
+    virtual std::string operator()() = 0;
   };
 
   template <typename T>
-  struct Callable : ICallable {
+  struct Model : Concept {
     /*
-     * Note:
+     * NOTE:
      * This universal constructor will be also used for copy construction.
      * https://ericniebler.com/2013/08/07/universal-references-and-the-copy-constructo/
      */
     template <typename TT>
-    Callable(TT&& t) : _callable(std::forward<TT>(t)) {}
-    void operator()() override { _callable(); }
+    Model(TT&& t) : _model(std::forward<TT>(t)) {}
+    std::string operator()() override { return _model(); }
 
    private:
-    T _callable;
+    T _model;
   };
 
  public:
   template <typename T>
-  Task(T&& obj) : _task(std::make_shared<Callable<T>>(std::forward<T>(obj))) {}
+  Wrapper(T&& obj)
+      : _wrapper(std::make_shared<Model<T>>(std::forward<T>(obj))) {}
 
-  void operator()() { (*_task)(); }
+  std::string operator()() { return (*_wrapper)(); }
 
  private:
-  std::shared_ptr<ICallable> _task;
+  std::shared_ptr<Concept> _wrapper;
 };
 
 int main() {
-  auto lambda1 = []() { std::cout << "lambda called" << std::endl; };
-
   struct Klass {
-    void f1() const {
-      std::cout << "member const function called" << std::endl;
-    }
-    void f2() {
-      std::cout << "another none-const member function called" << std::endl;
+    std::string memberFunc() const { return "member const function called"; }
+    std::string memberFunc() {
+      return "another none-const member function called";
     }
   } klass;
 
-  auto task1 = Task(lambda1);
-  const auto task2 = Task([klass]() { klass.f1(); });
+  auto lambda1 = []() -> std::string { return "lambda called"; };
+  auto function1 = Wrapper(lambda1);
 
-  auto tasks = std::vector<Task>();
-  tasks.push_back(task1);
-  tasks.push_back(task2);
-  tasks.push_back(Task(std::function<void()>(std::bind(&Klass::f2, &klass))));
+  /* captured lambda variable is const */
+  auto function2 = Wrapper([klass]() { return klass.memberFunc(); });
 
-  for (auto& task : tasks) {
-    task();
-  }
+  /* bind none-const member function explicitly */
+  auto function3 = Wrapper(std::function<std::string()>(std::bind(
+      static_cast<std::string (Klass::*)()>(&Klass::memberFunc), &klass)));
+
+  CHECK_VALUE("lambda", function1(), "lambda called");
+  CHECK_VALUE("const member function", function2(),
+              "member const function called");
+  CHECK_VALUE("none-const member function", function3(),
+              "another none-const member function called");
 
   return 0;
 }

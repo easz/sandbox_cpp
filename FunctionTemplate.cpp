@@ -1,3 +1,5 @@
+#include <string>
+
 #include "main.h"
 
 namespace FunctionTemplate {
@@ -6,9 +8,9 @@ class Klazz {
  public:
   /*
    * ERROR:
-   * constructor templates are named without using a function name, there
-   * is no way to provide an explicit template argument list for these function
-   * templates
+   * constructor templates are named without using a function name, therefore
+   * there is no way to provide an explicit template argument list for these
+   * function templates
    */
   // template <typename T> Klazz() {}
 

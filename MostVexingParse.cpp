@@ -5,7 +5,7 @@
 #include "main.h"
 
 /*
- * prefer `T obj;` or `T obj{};` over `T obj();` for construct an object to avoid most vexing parse.
+ * prefer `T obj;` or `T obj{};` over `T obj();` for object construction to avoid most vexing parse.
  */
 
 namespace MostVexingParse {
@@ -31,6 +31,8 @@ int main() {
    * Most vexing parse.
    * Object construction with parentheses is treated as a function declaration
    * https://en.wikipedia.org/wiki/Most_vexing_parse
+   *
+   * The expression `nc2` is treated as a function object.
    */
   // NonCopyable nc2();
   // v.push_back(nc2);
