@@ -30,10 +30,16 @@
     exit(EXIT_FAILURE);                                     \
   } while (0, 0)
 
-DECLARE_TEST(FunctionTemplate)
 DECLARE_TEST(FunctionPointer)
 DECLARE_TEST(UniversalReference)
 DECLARE_TEST(MostVexingParse)
 
 DECLARE_TEST(Polymorphism)
 DECLARE_TEST(TypeErasure)
+
+DECLARE_TEST(Template)
+DECLARE_TEST(TemplateFunction)
+
+DECLARE_TEST(Tuple)
+DECLARE_TEST(Algorithm)
+DECLARE_TEST(Sandbox)
