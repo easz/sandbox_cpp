@@ -1,5 +1,9 @@
 #include "main.h"
 
+#include <array>
+#include <vector>
+#include <iostream>
+
 int main() {
   RUN_TEST(FunctionPointer);
   RUN_TEST(UniversalReference);
@@ -14,5 +18,5 @@ int main() {
   RUN_TEST(Tuple);
   RUN_TEST(Algorithm);
   RUN_TEST(Sandbox);
-
+  RUN_TEST(DesignPattern);
 }
